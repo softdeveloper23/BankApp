@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class Account {
