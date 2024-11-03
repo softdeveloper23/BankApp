@@ -20,4 +20,15 @@ public class Account {
 
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
+
+    public Account() {
+    }
+
+    public Account(String username, String password, BigDecimal balance, List<Transaction> transactions, Collection<? extends GrantedAuthority> authorities) {
+        this.username = username;
+        this.password = password;
+        this.balance = balance;
+        this.transactions = transactions;
+        this.authorities = authorities;
+    }
 }
