@@ -1,11 +1,10 @@
 package com.example.bankapp.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 
 @Entity
 public class Account {
@@ -15,4 +14,10 @@ public class Account {
     private String username;
     private String password;
     private BigDecimal balance;
+
+    @OneToMany(mappedBy = "account")
+    private List<Transaction> transactions;
+
+    @Transient
+    private Collection<? extends GrantedAuthority> authorities;
 }
