@@ -5,7 +5,9 @@ import com.example.bankapp.model.Transaction;
 import com.example.bankapp.repository.AccountRepository;
 import com.example.bankapp.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -73,5 +75,20 @@ public class AccountService implements UserDetailsService {
 
     public List<Transaction> getTransactionHistory(Account account) {
         return transactionRepository.findByAccountId(account.getId());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = findAccountByUsername(username);
+        if (account == null) {
+            throw new UsernameNotFoundException("Account not found!");
+        }
+        return new Account(
+                account.getUsername(),
+                account.getPassword(),
+                account.getBalance(),
+                account.getTransactions(),
+                authorities()
+        );
     }
 }
