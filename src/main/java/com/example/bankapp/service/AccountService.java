@@ -5,6 +5,7 @@ import com.example.bankapp.model.Transaction;
 import com.example.bankapp.repository.AccountRepository;
 import com.example.bankapp.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -97,5 +98,39 @@ public class AccountService implements UserDetailsService {
 
     public Collection<? extends GrantedAuthority> authorities() {
         return Arrays.asList(new SimpleGrantedAuthority("User"));
+    }
+
+    public void transferAmount(Account fromAccount, String toUsername, BigDecimal amount) {
+        if (fromAccount.getBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient funds!");
+        }
+
+        Account toAccount = accountRepository.findByUsername(toUsername)
+                .orElseThrow(() -> new RuntimeException("Recipient account not found!"));
+
+        // Deduct from account.
+        fromAccount.setBalance(fromAccount.getBalance().subtract(amount));
+        accountRepository.save(fromAccount);
+
+        // Add balance to recipient account.
+        toAccount.setBalance(toAccount.getBalance().add(amount));
+        accountRepository.save(toAccount);
+
+        // Create transaction records.
+        Transaction debitTransaction = new Transaction(
+                amount,
+                "Transfer out to " + toAccount.getUsername(),
+                LocalDateTime.now(),
+                fromAccount
+        );
+        transactionRepository.save(debitTransaction);
+
+        Transaction creditTransaction = new Transaction(
+                amount,
+                "Transfer in to " + fromAccount.getUsername(),
+                LocalDateTime.now(),
+                toAccount
+        );
+        transactionRepository.save(creditTransaction);
     }
 }
