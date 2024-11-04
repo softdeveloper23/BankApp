@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AccountService implements UserDetailsService {
@@ -68,5 +69,9 @@ public class AccountService implements UserDetailsService {
                 account
         );
         transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> getTransactionHistory(Account account) {
+        return transactionRepository.findByAccountId(account.getId());
     }
 }
