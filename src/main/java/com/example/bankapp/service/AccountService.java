@@ -53,4 +53,20 @@ public class AccountService implements UserDetailsService {
         );
         transactionRepository.save(transaction);
     }
+
+    public void withdraw(Account account, BigDecimal amount) {
+        if (account.getBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient funds!");
+        }
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
+
+        Transaction transaction = new Transaction(
+                amount,
+                "Withdraw",
+                LocalDateTime.now(),
+                account
+        );
+        transactionRepository.save(transaction);
+    }
 }
